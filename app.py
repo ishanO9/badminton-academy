@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Student, Batch, Coach, ScheduleEntry, WaitingStudent, PerformanceScore
-from datetime import date
+from datetime import date, datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///badminton.db'
@@ -208,6 +208,60 @@ def move_to_students(id):
     db.session.commit()
 
     return redirect(url_for('waitingstudents', location=ws.batch.location, batch=batch_id))
+
+
+from datetime import datetime
+
+@app.route('/schedules', methods=['GET', 'POST'])
+def schedules():
+    if request.method == 'POST':
+        batch_id = request.form['batch_id']
+        day_of_week = request.form['day_of_week']
+        start_time_str = request.form['start_time']
+        end_time_str = request.form['end_time']
+        location = request.form['location']
+
+        # Convert time strings to datetime.time objects
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = datetime.strptime(end_time_str, "%H:%M").time()
+
+        new_entry = ScheduleEntry(
+            batch_id=batch_id,
+            day_of_week=day_of_week,
+            start_time=start_time,
+            end_time=end_time
+        )
+        db.session.add(new_entry)
+        db.session.commit()
+
+        return redirect(url_for('schedules', location=location))
+
+    # On GET: Load batches and schedule entries for the selected location
+    selected_location = request.args.get('location', '')
+    locations = [loc[0] for loc in db.session.query(Batch.location).distinct().all()]
+    batches = []
+    schedules = []
+
+    if selected_location:
+        batches = Batch.query.filter_by(location=selected_location).all()
+        batch_ids = [b.bid for b in batches]
+        schedules = ScheduleEntry.query.filter(ScheduleEntry.batch_id.in_(batch_ids)).all()
+
+    return render_template('schedules.html',
+                           locations=locations,
+                           selected_location=selected_location,
+                           batches=batches,
+                           schedules=schedules)
+
+@app.route('/delete_schedule/<int:id>', methods=['POST'])
+def delete_schedule(id):
+    entry = ScheduleEntry.query.get_or_404(id)
+    location = request.form.get('location', '')
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for('schedules', location=location))
+
+
 
 # -------------------- Run App --------------------
 if __name__ == '__main__':

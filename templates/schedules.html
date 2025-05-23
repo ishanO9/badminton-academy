@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Schedules{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Schedule Timetable</h2>
+
+    <!-- Location Selection Form -->
+    <form method="GET" action="{{ url_for('schedules') }}" class="mb-4 row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="location" class="form-label">Select Location</label>
+            <select name="location" id="location" class="form-select" onchange="this.form.submit()" required>
+                <option value="">-- Select Location --</option>
+                {% for loc in locations %}
+                <option value="{{ loc }}" {% if loc == selected_location %}selected{% endif %}>{{ loc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if selected_location %}
+    <!-- Add Schedule Entry Form -->
+    <form method="POST" action="{{ url_for('schedules') }}" class="row g-3 align-items-end mb-4">
+        <input type="hidden" name="location" value="{{ selected_location }}">
+        <div class="col-md-3">
+            <label for="batch_id" class="form-label">Batch</label>
+            <select name="batch_id" id="batch_id" class="form-select" required>
+                {% for batch in batches %}
+                <option value="{{ batch.bid }}">{{ batch.bid }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Day</label>
+            <select name="day_of_week" class="form-select" required>
+                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                <option value="{{ day }}">{{ day }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Start Time</label>
+            <input type="time" name="start_time" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">End Time</label>
+            <input type="time" name="end_time" class="form-control" required>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Add Entry</button>
+        </div>
+    </form>
+
+    <!-- Timetable Grid -->
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Day</th>
+                {% for hour in range(5, 22) %}
+                <th>{{ "%02d:00" % hour }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+            <tr>
+                <th>{{ day }}</th>
+                {% for hour in range(5, 22) %}
+                <td>
+                    {% for entry in schedules %}
+                        {% if entry.day_of_week == day and entry.start_time.hour == hour %}
+                            <form method="POST" action="{{ url_for('delete_schedule', id=entry.id) }}" onsubmit="return confirm('Delete this entry?')" style="display:inline;">
+                                <input type="hidden" name="location" value="{{ selected_location }}">
+                                <button type="submit" class="btn btn-link p-0 m-0 text-danger" style="font-size: 0.85rem; line-height: 1.1;">
+                                    {{ entry.batch_id }}<br>{{ entry.start_time.strftime('%H:%M') }} - {{ entry.end_time.strftime('%H:%M') }}
+                                </button>
+                            </form>
+
+                        {% endif %}
+
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
