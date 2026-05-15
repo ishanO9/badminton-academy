@@ -15,7 +15,7 @@ pipeline {
         stage('SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
-                    sh "${tool 'SonarScanner'}/bin/sonar-scanner"
+                    bat "${tool 'SonarScanner'}\\bin\\sonar-scanner.bat"
                 }
             }
         }
