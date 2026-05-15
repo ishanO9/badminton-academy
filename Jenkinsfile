@@ -12,6 +12,13 @@ pipeline {
                 echo 'Jenkinsfile is working'
             }
         }
+        stage('SonarCloud Analysis') {
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
     }
 
 
