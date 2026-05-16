@@ -157,7 +157,7 @@ def waitingstudents():
         if selected_batch:
             waiting_students = WaitingStudent.query.filter_by(batch_id=selected_batch).all()
         else:
-            # Show waiting students of all batches in selected location if batch not selected
+            
             batch_ids = [b.bid for b in batches]
             waiting_students = WaitingStudent.query.filter(WaitingStudent.batch_id.in_(batch_ids)).all()
 
@@ -168,7 +168,7 @@ def waitingstudents():
                            selected_location=selected_location,
                            selected_batch=selected_batch)
 
-# Add waiting student
+
 @app.route('/add_waitingstudent', methods=['POST'])
 def add_waitingstudent():
     name = request.form['name']
@@ -235,8 +235,7 @@ def schedules():
         db.session.commit()
 
         return redirect(url_for('schedules', location=location))
-
-    # On GET: Load batches and schedule entries for the selected location
+    
     selected_location = request.args.get('location', '')
     locations = [loc[0] for loc in db.session.query(Batch.location).distinct().all()]
     batches = []
@@ -267,4 +266,4 @@ def delete_schedule(id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host = "0.0.0.0",port =5000, debug=True)
