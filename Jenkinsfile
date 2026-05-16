@@ -45,7 +45,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
 
-                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS"
+                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
 
                     bat "docker tag badminton_academy %DOCKER_USER%/badminton_academy:latest"
 
