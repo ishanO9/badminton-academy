@@ -37,7 +37,7 @@ pipeline {
                 bat 'docker build -t badminton_academy .'
             }
         }
-        stage('Push Docker Image') {
+        /*stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
@@ -51,8 +51,22 @@ pipeline {
 
                     bat "docker push %DOCKER_USER%/badminton_academy:latest"
                 }
+
             }
-        }
+
+        }*/
+        stage('Deploy Container') {
+            steps {
+                bat '''
+                docker stop badminton_app || exit 0
+                docker rm badminton_app || exit 0
+
+                docker run -d ^
+                  --name badminton_app ^
+                  -p 5000:5000 ^
+                  badminton_academy
+                '''
+            }
     }
 
 
