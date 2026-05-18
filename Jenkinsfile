@@ -68,9 +68,7 @@ pipeline {
             steps {
 
                 bat 'docker stop badminton_app || ver > nul'
-
                 bat 'docker rm badminton_app || ver > nul'
-
                 bat 'docker run -d --name badminton_app -p 5000:5000 badminton_academy'
             }
         }
