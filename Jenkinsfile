@@ -6,16 +6,20 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ishanO9/badminton-academy.git'
+                git branch: 'main',
+                    url: 'https://github.com/ishanO9/badminton-academy.git'
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Jenkinsfile is working'
             }
         }
+
         stage('SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
@@ -23,21 +27,26 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency Check')  {
+
+        stage('OWASP Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '''
                     --scan .
                     --format HTML
                     --out reports
-                ''', odcInstallation: 'OWASP-DC'
+                ''',
+                odcInstallation: 'OWASP-DC'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t badminton_academy .'
             }
         }
-        /*stage('Push Docker Image') {
+
+        /*
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
@@ -51,10 +60,10 @@ pipeline {
 
                     bat "docker push %DOCKER_USER%/badminton_academy:latest"
                 }
-
             }
+        }
+        */
 
-        }*/
         stage('Deploy Container') {
             steps {
                 bat '''
@@ -67,7 +76,7 @@ pipeline {
                   badminton_academy
                 '''
             }
+        }
+
     }
-
-
 }
