@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Coaches</h2>
+    <h2>Coaches Tab</h2>
 
     <!-- Add Coach Form -->
     <form action="{{ url_for('coaches') }}" method="POST" class="row g-3 mb-4">
@@ -53,7 +53,8 @@
                 <td>{{ coach.supervisor.name if coach.supervisor else 'None' }}</td>
                 <td>{{ "%.2f"|format(coach.salary) if coach.salary is not none else '-' }}</td>
                 <td>
-                    <form action="{{ url_for('delete_coach', coach_id=coach.cid) }}" method="POST" onsubmit="return confirm('Delete this coach?');">
+                    <form action="{{ url_for('delete_coach', coach_id=coach.cid) }}" 
+                    method="POST" onsubmit="return confirm('Delete this coach?');">
                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                     </form>
                 </td>
